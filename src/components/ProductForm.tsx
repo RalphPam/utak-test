@@ -166,7 +166,7 @@ const ProductForm = ({
     // Reset fields when hiding form
     if (formState === null) form.resetFields()
     if (formState === 'view') form.setFieldsValue(selectedProduct)
-  }, [ formState ])
+  }, [ formState, selectedProduct ])
 
   return (
     <StyledSlider width={350} collapsedWidth={0} collapsed={formState === null}>
