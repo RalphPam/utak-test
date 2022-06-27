@@ -1,5 +1,7 @@
 const colors = {
-  'headerBg': '#141414',
+  'lightBlack': '#141414',
+  'black': '#000',
+  'white': '#fff',
 }
 
 export default colors

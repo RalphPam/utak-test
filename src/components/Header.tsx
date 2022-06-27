@@ -6,7 +6,7 @@ const StyledHeader = styled(Layout.Header)`
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  background-color: ${colors.headerBg};
+  background-color: ${colors.lightBlack};
 `
 
 const Header = () => {
