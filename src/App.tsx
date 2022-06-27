@@ -55,6 +55,7 @@ function App() {
           </Space>
         </StyledContent>
         <ProductForm
+          setSelectedProduct={setSelectedProduct}
           setProducts={setProducts}
           selectedProduct={selectedProduct}
           formState={formState}

@@ -1,7 +1,7 @@
 import { Button, Form, Input, Layout, Row, Select, Space } from 'antd'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { createProduct, deleteProduct } from '../services'
+import { createProduct, deleteProduct, updateProductDetails } from '../services'
 import { FormState, ProductDetails } from '../types/form'
 import { GetProductsResponse } from '../types/response'
 import colors from '../utils/color'
@@ -80,7 +80,7 @@ const Header = styled(Row)`
 `
 
 const Edit = styled(Button)`
- &.ant-btn-dashed {
+  &.ant-btn-dashed {
     border-color: ${colors.orange};
     color: ${colors.orange};
   }
@@ -98,12 +98,20 @@ interface ProductFormProps {
   setFormState: Dispatch<SetStateAction<FormState>>
   setProducts: Dispatch<SetStateAction<GetProductsResponse>>
   selectedProduct: GetProductsResponse[number] | null
+  setSelectedProduct: Dispatch<SetStateAction<GetProductsResponse[number] | null>>
 }
 
-const ProductForm = ({ formState, setFormState, selectedProduct, setProducts }: ProductFormProps) => {
+const ProductForm = ({
+  formState,
+  setFormState,
+  selectedProduct,
+  setProducts,
+  setSelectedProduct,
+}: ProductFormProps) => {
   const [ form ] = Form.useForm()
   const [ isLoading, setIsLoading ] = useState(false)
   const [ isDeleting, setIsDeleting ] = useState(false)
+  const [ isEdited, setIsEdited ] = useState(false)
 
   const onFinish = async (values: ProductDetails) => {
     if (parseFloat(values.cost) > parseFloat(values.price)) {
@@ -121,6 +129,17 @@ const ProductForm = ({ formState, setFormState, selectedProduct, setProducts }: 
       if (res) {
         setFormState('view')
       }
+    } else if (formState === 'edit' && selectedProduct) {
+      const res = await updateProductDetails(selectedProduct.id, values)
+      if (res) {
+        const updatedDetails = {
+          ...values,
+          id: selectedProduct.id,
+        }
+        setSelectedProduct(updatedDetails)
+        setProducts(prev => prev.map(item => item.id === selectedProduct.id ? updatedDetails : item))
+        setFormState('view')
+      }
     }
     setIsLoading(false)
   }
@@ -135,7 +154,11 @@ const ProductForm = ({ formState, setFormState, selectedProduct, setProducts }: 
     setFormState(null)
     setIsDeleting(false)
   }
-  
+
+  const onFieldsChange = () => {
+    setIsEdited(true)
+  }
+
   useEffect(() => {
     // Reset fields when hiding form
     if (formState === null) form.resetFields()
@@ -162,16 +185,20 @@ const ProductForm = ({ formState, setFormState, selectedProduct, setProducts }: 
           </svg>
         </Minimize>
         <Space>
-          {formState === 'view' &&
+          {formState === 'view' && (
             <Edit type="dashed" onClick={() => setFormState('edit')}>
               EDIT
             </Edit>
-          }
-          {formState !== 'create' &&
-            <Button type="dashed" danger onClick={onDelete} loading={isDeleting}>
+          )}
+          {formState !== 'create' && (
+            <Button
+              type="dashed"
+              danger
+              onClick={onDelete}
+              loading={isDeleting}>
               DELETE
             </Button>
-          }
+          )}
         </Space>
       </Header>
       <Form
@@ -181,43 +208,75 @@ const ProductForm = ({ formState, setFormState, selectedProduct, setProducts }: 
         wrapperCol={{
           span: 17,
         }}
+        onFieldsChange={onFieldsChange}
         form={form}
         onFinish={onFinish}>
-        <FormItem label="Category" name="category" rules={[ { required: true, message: 'Category is required' } ]}>
+        <FormItem
+          label="Category"
+          name="category"
+          rules={[ { required: true, message: 'Category is required' } ]}>
           <StyledInput readOnly={formState === 'view'} />
         </FormItem>
-        <FormItem label="Name" name="name" rules={[ { required: true, message: 'Name is required' } ]}>
+        <FormItem
+          label="Name"
+          name="name"
+          rules={[ { required: true, message: 'Name is required' } ]}>
           <StyledInput readOnly={formState === 'view'} />
         </FormItem>
         <FormItem label="Options" name="options" initialValue={[]}>
-          <StyledSelect disabled={formState === 'view'} mode="tags" open={false} />
+          <StyledSelect
+            disabled={formState === 'view'}
+            mode="tags"
+            open={false}
+          />
         </FormItem>
-        <FormItem label="Price($)" name="price" rules={[ { required: true, message: 'Price is required' } ]}>
+        <FormItem
+          label="Price($)"
+          name="price"
+          rules={[ { required: true, message: 'Price is required' } ]}>
           <StyledInput readOnly={formState === 'view'} type="number" />
         </FormItem>
-        <FormItem label="Cost($)" name="cost" rules={[ { required: true, message: 'Cost is required' } ]}>
+        <FormItem
+          label="Cost($)"
+          name="cost"
+          rules={[ { required: true, message: 'Cost is required' } ]}>
           <StyledInput readOnly={formState === 'view'} type="number" />
         </FormItem>
-        <FormItem label="Stock" name="stock" rules={[ { required: true, message: 'Stock is required' } ]}>
+        <FormItem
+          label="Stock"
+          name="stock"
+          rules={[ { required: true, message: 'Stock is required' } ]}>
           <StyledInput readOnly={formState === 'view'} type="number" />
         </FormItem>
-        {formState && [ 'create', 'edit' ].includes(formState) &&
+        {formState && [ 'create', 'edit' ].includes(formState) && (
           <FormItem wrapperCol={{ span: 24 }}>
             <Row justify="end">
               <Space>
                 <Button
                   type="primary"
                   danger
-                  onClick={() => setFormState(prev => prev === 'create' ? null : 'view')}>
+                  onClick={() =>
+                    setFormState(prev => {
+                      if (prev === 'create') return null
+                      else {
+                        form.setFieldsValue(selectedProduct)
+                        return 'view'
+                      }
+                    })
+                  }>
                   CANCEL
                 </Button>
-                <Button type="primary" htmlType="submit" loading={isLoading}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isLoading}
+                  disabled={formState === 'edit' ? !isEdited : false}>
                   SAVE
                 </Button>
               </Space>
             </Row>
           </FormItem>
-        }
+        )}
       </Form>
     </StyledSlider>
   )
