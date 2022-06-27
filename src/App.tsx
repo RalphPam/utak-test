@@ -1,11 +1,9 @@
 import 'antd/dist/antd.min.css'
 import { Layout, Space } from 'antd'
 import styled from 'styled-components'
-import { getDatabase, ref, set } from 'firebase/database'
-import { v4 as uuidV4 } from 'uuid'
 import { Header, Product, ProductForm } from './components'
 import colors from './utils/color'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { FormState } from './types/form'
 
 const { Content } = Layout
