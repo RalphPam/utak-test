@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { createProduct } from '../services'
 import { FormState, ProductDetails } from '../types/form'
+import { GetProductsResponse } from '../types/response'
 import colors from '../utils/color'
 
 const StyledSlider = styled(Layout.Sider)`
@@ -95,9 +96,10 @@ const Minimize = styled.button`
 interface ProductFormProps {
   formState: FormState
   setFormState: Dispatch<SetStateAction<FormState>>
+  selectedProduct: GetProductsResponse[number] | null
 }
 
-const ProductForm = ({ formState, setFormState }: ProductFormProps) => {
+const ProductForm = ({ formState, setFormState, selectedProduct }: ProductFormProps) => {
   const [ form ] = Form.useForm()
   const [ isLoading, setIsLoading ] = useState(false)
 
@@ -124,6 +126,7 @@ const ProductForm = ({ formState, setFormState }: ProductFormProps) => {
   useEffect(() => {
     // Reset fields when hiding form
     if (formState === null) form.resetFields()
+    if (formState === 'view') form.setFieldsValue(selectedProduct)
   }, [ formState ])
 
   return (
@@ -168,22 +171,22 @@ const ProductForm = ({ formState, setFormState }: ProductFormProps) => {
         form={form}
         onFinish={onFinish}>
         <FormItem label="Category" name="category" rules={[ { required: true, message: 'Category is required' } ]}>
-          <StyledInput />
+          <StyledInput readOnly={formState === 'view'} />
         </FormItem>
         <FormItem label="Name" name="name" rules={[ { required: true, message: 'Name is required' } ]}>
-          <StyledInput />
+          <StyledInput readOnly={formState === 'view'} />
         </FormItem>
         <FormItem label="Options" name="options" initialValue={[]}>
-          <StyledSelect mode="tags" open={false} />
+          <StyledSelect disabled={formState === 'view'} mode="tags" open={false} />
         </FormItem>
         <FormItem label="Price($)" name="price" rules={[ { required: true, message: 'Price is required' } ]}>
-          <StyledInput type="number" />
+          <StyledInput readOnly={formState === 'view'} type="number" />
         </FormItem>
         <FormItem label="Cost($)" name="cost" rules={[ { required: true, message: 'Cost is required' } ]}>
-          <StyledInput type="number" />
+          <StyledInput readOnly={formState === 'view'} type="number" />
         </FormItem>
         <FormItem label="Stock" name="stock" rules={[ { required: true, message: 'Stock is required' } ]}>
-          <StyledInput type="number" />
+          <StyledInput readOnly={formState === 'view'} type="number" />
         </FormItem>
         {formState && [ 'create', 'edit' ].includes(formState) &&
           <FormItem wrapperCol={{ span: 24 }}>

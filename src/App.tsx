@@ -54,7 +54,7 @@ function App() {
             {renderProducts()}
           </Space>
         </StyledContent>
-        <ProductForm formState={formState} setFormState={setFormState} />
+        <ProductForm selectedProduct={selectedProduct} formState={formState} setFormState={setFormState} />
       </StyledLayout>
     </Layout>
   )
