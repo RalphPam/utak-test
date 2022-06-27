@@ -1,7 +1,7 @@
 import 'antd/dist/antd.min.css'
 import { Layout, Space } from 'antd'
 import styled from 'styled-components'
-import { Header, Product, ProductForm } from './components'
+import { Header, ListPlaceholder, Product, ProductForm } from './components'
 import colors from './utils/color'
 import { useEffect, useState } from 'react'
 import type { FormState } from './types/form'
@@ -24,25 +24,34 @@ const StyledContent = styled(Content)`
 function App() {
   const [ formState, setFormState ] = useState<FormState>(null)
   const [ products, setProducts ] = useState<GetProductsResponse>([])
+  const [ isLoading, setIsLoading ] = useState(false)
   const [ selectedProduct, setSelectedProduct ] = useState<
     GetProductsResponse[number] | null
   >(null)
 
   useEffect(() => {
-    getProducts().then(products => setProducts(products))
+    setIsLoading(true)
+    getProducts().then(products => {
+      setProducts(products)
+      setIsLoading(false)
+    })
   }, [])
 
   const renderProducts = () => {
-    if (products.length === 0) return null
-    return products.map(item => (
-      <Product
-        selectedProduct={selectedProduct}
-        setSelectedProduct={setSelectedProduct}
-        productDetails={item}
-        key={item.id}
-        setFormState={setFormState}
-      />
-    ))
+    if (products.length === 0) return <ListPlaceholder isLoading={isLoading} />
+    return (
+      <Space wrap size={12}>
+        {products.map(item => (
+          <Product
+            selectedProduct={selectedProduct}
+            setSelectedProduct={setSelectedProduct}
+            productDetails={item}
+            key={item.id}
+            setFormState={setFormState}
+          />
+        ))}
+      </Space>
+    )
   }
 
   return (
@@ -50,9 +59,7 @@ function App() {
       <Header setFormState={setFormState} />
       <StyledLayout>
         <StyledContent>
-          <Space wrap size={12}>
-            {renderProducts()}
-          </Space>
+          {renderProducts()}
         </StyledContent>
         <ProductForm
           setSelectedProduct={setSelectedProduct}
