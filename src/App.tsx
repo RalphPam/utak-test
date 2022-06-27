@@ -33,6 +33,10 @@ function App() {
     setIsLoading(true)
     getProducts().then(products => {
       setProducts(products)
+      if (selectedProduct === null) {
+        setSelectedProduct(products[0])
+        setFormState('view')
+      }
       setIsLoading(false)
     })
   }, [])
