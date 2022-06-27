@@ -1,7 +1,8 @@
 import { Button, Form, Input, Layout, Row, Select, Space } from 'antd'
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { FormState } from '../types/form'
+import { createProduct } from '../services'
+import { FormState, ProductDetails } from '../types/form'
 import colors from '../utils/color'
 
 const StyledSlider = styled(Layout.Sider)`
@@ -31,6 +32,9 @@ const StyledInput = styled(Input)`
     &:focus {
       box-shadow: none;
     }
+  }
+  &.ant-input-status-error:not(.ant-input-disabled):not(.ant-input-borderless).ant-input {
+    background-color: transparent;
   }
 `
 
@@ -94,6 +98,34 @@ interface ProductFormProps {
 }
 
 const ProductForm = ({ formState, setFormState }: ProductFormProps) => {
+  const [ form ] = Form.useForm()
+  const [ isLoading, setIsLoading ] = useState(false)
+
+  const onFinish = async (values: ProductDetails) => {
+    if (parseFloat(values.cost) > parseFloat(values.price)) {
+      form.setFields([
+        {
+          name: 'cost',
+          errors: [ 'Cost must be less than price' ],
+        },
+      ])
+      return
+    }
+    setIsLoading(true)
+    if (formState === 'create') {
+      const res = await createProduct(values)
+      if (res) {
+        setFormState('view')
+      }
+    }
+    setIsLoading(false)
+  }
+  
+  useEffect(() => {
+    // Reset fields when hiding form
+    if (formState === null) form.resetFields()
+  }, [ formState ])
+
   return (
     <StyledSlider width={350} collapsedWidth={0} collapsed={formState === null}>
       <Header justify="space-between">
@@ -128,27 +160,29 @@ const ProductForm = ({ formState, setFormState }: ProductFormProps) => {
       </Header>
       <Form
         labelCol={{
-          span: 6,
+          span: 7,
         }}
         wrapperCol={{
-          span: 18,
-        }}>
-        <FormItem label="Category">
+          span: 17,
+        }}
+        form={form}
+        onFinish={onFinish}>
+        <FormItem label="Category" name="category" rules={[ { required: true, message: 'Category is required' } ]}>
           <StyledInput />
         </FormItem>
-        <FormItem label="Name">
+        <FormItem label="Name" name="name" rules={[ { required: true, message: 'Name is required' } ]}>
           <StyledInput />
         </FormItem>
-        <FormItem label="Options">
+        <FormItem label="Options" name="options" initialValue={[]}>
           <StyledSelect mode="tags" open={false} />
         </FormItem>
-        <FormItem label="Price($)">
+        <FormItem label="Price($)" name="price" rules={[ { required: true, message: 'Price is required' } ]}>
           <StyledInput type="number" />
         </FormItem>
-        <FormItem label="Cost($)">
+        <FormItem label="Cost($)" name="cost" rules={[ { required: true, message: 'Cost is required' } ]}>
           <StyledInput type="number" />
         </FormItem>
-        <FormItem label="Stock">
+        <FormItem label="Stock" name="stock" rules={[ { required: true, message: 'Stock is required' } ]}>
           <StyledInput type="number" />
         </FormItem>
         {formState && [ 'create', 'edit' ].includes(formState) &&
@@ -161,7 +195,7 @@ const ProductForm = ({ formState, setFormState }: ProductFormProps) => {
                   onClick={() => setFormState(prev => prev === 'create' ? null : 'view')}>
                   CANCEL
                 </Button>
-                <Button type="primary" htmlType="submit">
+                <Button type="primary" htmlType="submit" loading={isLoading}>
                   SAVE
                 </Button>
               </Space>
