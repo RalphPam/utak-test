@@ -1,6 +1,7 @@
 import { Button, Form, Input, Layout, Row, Select, Space } from 'antd'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { uuidv4 } from '@firebase/util'
 import { createProduct, deleteProduct, updateProductDetails } from '../services'
 import { FormState, ProductDetails } from '../types/form'
 import { GetProductsResponse } from '../types/response'
@@ -125,8 +126,10 @@ const ProductForm = ({
     }
     setIsLoading(true)
     if (formState === 'create') {
-      const res = await createProduct(values)
+      const id = uuidv4()
+      const res = await createProduct(id, values)
       if (res) {
+        setProducts(prev => [ ...prev, { ...values, id } ])
         setFormState('view')
       }
     } else if (formState === 'edit' && selectedProduct) {
