@@ -8,3 +8,12 @@ export interface ProductDetails {
   price: string
   stock: string
 }
+
+export interface ProductDetailsWithId {
+  category: string
+  cost: string
+  name: string
+  options: Array<string>
+  price: string
+  stock: string
+}

@@ -3,8 +3,10 @@ import { Layout, Space } from 'antd'
 import styled from 'styled-components'
 import { Header, Product, ProductForm } from './components'
 import colors from './utils/color'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormState } from './types/form'
+import { getProducts } from './services'
+import { GetProductsResponse } from './types/response'
 
 const { Content } = Layout
 
@@ -19,24 +21,37 @@ const StyledContent = styled(Content)`
   overflow-y: auto;
 `
 
-
 function App() {
   const [ formState, setFormState ] = useState<FormState>(null)
+  const [ products, setProducts ] = useState<GetProductsResponse>([])
+  const [ selectedProduct, setSelectedProduct ] = useState<
+    GetProductsResponse[number] | null
+  >(null)
+
+  useEffect(() => {
+    getProducts().then(products => setProducts(products))
+  }, [])
+
+  const renderProducts = () => {
+    if (products.length === 0) return null
+    return products.map(item => (
+      <Product
+        selectedProduct={selectedProduct}
+        setSelectedProduct={setSelectedProduct}
+        productDetails={item}
+        key={item.id}
+        setFormState={setFormState}
+      />
+    ))
+  }
+
   return (
     <Layout>
       <Header setFormState={setFormState} />
       <StyledLayout>
         <StyledContent>
           <Space wrap size={12}>
-            <Product setFormState={setFormState} />
-            <Product setFormState={setFormState} />
-            <Product setFormState={setFormState} />
-            <Product setFormState={setFormState} />
-            <Product setFormState={setFormState} />
-            <Product setFormState={setFormState} />
-            <Product setFormState={setFormState} />
-            <Product setFormState={setFormState} />
-            <Product setFormState={setFormState} />
+            {renderProducts()}
           </Space>
         </StyledContent>
         <ProductForm formState={formState} setFormState={setFormState} />

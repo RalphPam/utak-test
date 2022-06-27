@@ -1,7 +1,9 @@
 import { uuidv4 } from '@firebase/util'
 import { message } from 'antd'
-import { getDatabase, ref, set } from 'firebase/database'
+import { child, get, getDatabase, ref, set } from 'firebase/database'
 import { ProductDetails } from './types/form'
+import { GetProductsResponse } from './types/response'
+import { formatChildToArray } from './utils/format'
 
 export async function createProduct(values: ProductDetails): Promise<boolean> {
   try {
@@ -13,5 +15,20 @@ export async function createProduct(values: ProductDetails): Promise<boolean> {
     message.error('Something went wrong, please try again later', 3)
     console.error(error)
     return false
+  }
+}
+
+export async function getProducts(): Promise<GetProductsResponse> {
+  try {
+    const dbRef = ref(getDatabase())
+    const snapshot = await get(child(dbRef, 'products'))
+    if (snapshot.exists()) {
+      return formatChildToArray(snapshot.val()) as GetProductsResponse
+    }
+    return []
+  } catch (error) {
+    message.error('Something went wrong, please try again later', 3)
+    console.error(error)
+    return []
   }
 }

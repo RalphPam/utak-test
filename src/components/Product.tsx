@@ -2,6 +2,7 @@ import { Card, Typography } from 'antd'
 import { Dispatch, SetStateAction } from 'react'
 import styled from 'styled-components'
 import { FormState } from '../types/form'
+import { GetProductsResponse } from '../types/response'
 import colors from '../utils/color'
 
 const StyledCard = styled(Card)`
@@ -17,6 +18,10 @@ const StyledCard = styled(Card)`
     align-items: center;
     height: 100%;
   }
+  &.active {
+    box-shadow: 0 0 0 5px ${colors.green25};
+    border-color: ${colors.green};
+  }
 `
 
 const Name = styled(Typography.Text)`
@@ -31,12 +36,25 @@ const Name = styled(Typography.Text)`
 
 interface ProductProps {
   setFormState: Dispatch<SetStateAction<FormState>>
+  productDetails: GetProductsResponse[number]
+  selectedProduct: GetProductsResponse[number] | null
+  setSelectedProduct: Dispatch<SetStateAction<GetProductsResponse[number] | null>>
 }
 
-const Product = ({ setFormState }: ProductProps) => {
+const Product = ({
+  setFormState,
+  productDetails,
+  selectedProduct,
+  setSelectedProduct,
+}: ProductProps) => {
   return (
-    <StyledCard onClick={() => setFormState('view')}>
-      <Name>Product Name</Name>
+    <StyledCard
+      className={selectedProduct?.id === productDetails.id ? 'active' : ''}
+      onClick={() => {
+        setFormState('view')
+        setSelectedProduct(productDetails)
+      }}>
+      <Name>{productDetails.name}</Name>
     </StyledCard>
   )
 }
