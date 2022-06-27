@@ -7,7 +7,7 @@ const StyledCard = styled(Card)`
   width: 100px;
   height: 100px;
   border-radius: 7px;
-  border-color: rgba(255, 255, 255, .25);
+  border-color: ${colors.borderColor};
   .ant-card-body {
     padding: 8px;
     display: flex;
