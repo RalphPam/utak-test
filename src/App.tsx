@@ -3,6 +3,8 @@ import { Layout, Space } from 'antd'
 import styled from 'styled-components'
 import { Header, Product, ProductForm } from './components'
 import colors from './utils/color'
+import { useState } from 'react'
+import type { FormState } from './types/form'
 
 const { Content } = Layout
 
@@ -17,25 +19,27 @@ const StyledContent = styled(Content)`
   overflow-y: auto;
 `
 
+
 function App() {
+  const [ formState, setFormState ] = useState<FormState>(null)
   return (
     <Layout>
-      <Header />
+      <Header setFormState={setFormState} />
       <StyledLayout>
         <StyledContent>
           <Space wrap size={12}>
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
-            <Product />
+            <Product setFormState={setFormState} />
+            <Product setFormState={setFormState} />
+            <Product setFormState={setFormState} />
+            <Product setFormState={setFormState} />
+            <Product setFormState={setFormState} />
+            <Product setFormState={setFormState} />
+            <Product setFormState={setFormState} />
+            <Product setFormState={setFormState} />
+            <Product setFormState={setFormState} />
           </Space>
         </StyledContent>
-        <ProductForm />
+        <ProductForm formState={formState} setFormState={setFormState} />
       </StyledLayout>
     </Layout>
   )

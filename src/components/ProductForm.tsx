@@ -1,5 +1,7 @@
 import { Button, Form, Input, Layout, Row, Select, Space } from 'antd'
+import { Dispatch, SetStateAction } from 'react'
 import styled from 'styled-components'
+import { FormState } from '../types/form'
 import colors from '../utils/color'
 
 const StyledSlider = styled(Layout.Sider)`
@@ -86,11 +88,16 @@ const Minimize = styled.button`
   display: flex;
 `
 
-const ProductForm = () => {
+interface ProductFormProps {
+  formState: FormState
+  setFormState: Dispatch<SetStateAction<FormState>>
+}
+
+const ProductForm = ({ formState, setFormState }: ProductFormProps) => {
   return (
-    <StyledSlider width={350} collapsedWidth={0}>
+    <StyledSlider width={350} collapsedWidth={0} collapsed={formState === null}>
       <Header justify="space-between">
-        <Minimize>
+        <Minimize onClick={() => setFormState(null)}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width={30}
@@ -107,12 +114,16 @@ const ProductForm = () => {
           </svg>
         </Minimize>
         <Space>
-          <Edit type="dashed">
-            EDIT
-          </Edit>
-          <Button type="dashed" danger>
-            DELETE
-          </Button>
+          {formState === 'view' &&
+            <Edit type="dashed" onClick={() => setFormState('edit')}>
+              EDIT
+            </Edit>
+          }
+          {formState !== 'create' &&
+            <Button type="dashed" danger>
+              DELETE
+            </Button>
+          }
         </Space>
       </Header>
       <Form
@@ -140,20 +151,23 @@ const ProductForm = () => {
         <FormItem label="Stock">
           <StyledInput type="number" />
         </FormItem>
-        <FormItem wrapperCol={{ span: 24 }}>
-          <Row justify="end">
-            <Space>
-              <Button
-                type="primary"
-                danger>
-                CANCEL
-              </Button>
-              <Button type="primary" htmlType="submit">
-                SAVE
-              </Button>
-            </Space>
-          </Row>
-        </FormItem>
+        {formState && [ 'create', 'edit' ].includes(formState) &&
+          <FormItem wrapperCol={{ span: 24 }}>
+            <Row justify="end">
+              <Space>
+                <Button
+                  type="primary"
+                  danger
+                  onClick={() => setFormState(prev => prev === 'create' ? null : 'view')}>
+                  CANCEL
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  SAVE
+                </Button>
+              </Space>
+            </Row>
+          </FormItem>
+        }
       </Form>
     </StyledSlider>
   )

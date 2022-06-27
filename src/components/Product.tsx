@@ -1,5 +1,7 @@
 import { Card, Typography } from 'antd'
+import { Dispatch, SetStateAction } from 'react'
 import styled from 'styled-components'
+import { FormState } from '../types/form'
 import colors from '../utils/color'
 
 const StyledCard = styled(Card)`
@@ -27,9 +29,13 @@ const Name = styled(Typography.Text)`
   }
 `
 
-const Product = () => {
+interface ProductProps {
+  setFormState: Dispatch<SetStateAction<FormState>>
+}
+
+const Product = ({ setFormState }: ProductProps) => {
   return (
-    <StyledCard>
+    <StyledCard onClick={() => setFormState('view')}>
       <Name>Product Name</Name>
     </StyledCard>
   )

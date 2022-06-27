@@ -1,5 +1,7 @@
 import { Layout, Button } from 'antd'
+import { Dispatch, SetStateAction } from 'react'
 import styled from 'styled-components'
+import { FormState } from '../types/form'
 import colors from '../utils/color'
 
 const StyledHeader = styled(Layout.Header)`
@@ -10,10 +12,14 @@ const StyledHeader = styled(Layout.Header)`
   border-bottom: 1px solid ${colors.borderColor};
 `
 
-const Header = () => {
+interface HeaderProps {
+  setFormState: Dispatch<SetStateAction<FormState>>
+}
+
+const Header = ({ setFormState }: HeaderProps) => {
   return (
     <StyledHeader>
-      <Button type='primary' size='large'>CREATE</Button>
+      <Button type='primary' size='large' onClick={() => setFormState('create')}>CREATE</Button>
     </StyledHeader>
   )
 }
