@@ -1,7 +1,7 @@
 import { Button, Form, Input, Layout, Row, Select, Space } from 'antd'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { createProduct } from '../services'
+import { createProduct, deleteProduct } from '../services'
 import { FormState, ProductDetails } from '../types/form'
 import { GetProductsResponse } from '../types/response'
 import colors from '../utils/color'
@@ -96,12 +96,14 @@ const Minimize = styled.button`
 interface ProductFormProps {
   formState: FormState
   setFormState: Dispatch<SetStateAction<FormState>>
+  setProducts: Dispatch<SetStateAction<GetProductsResponse>>
   selectedProduct: GetProductsResponse[number] | null
 }
 
-const ProductForm = ({ formState, setFormState, selectedProduct }: ProductFormProps) => {
+const ProductForm = ({ formState, setFormState, selectedProduct, setProducts }: ProductFormProps) => {
   const [ form ] = Form.useForm()
   const [ isLoading, setIsLoading ] = useState(false)
+  const [ isDeleting, setIsDeleting ] = useState(false)
 
   const onFinish = async (values: ProductDetails) => {
     if (parseFloat(values.cost) > parseFloat(values.price)) {
@@ -121,6 +123,17 @@ const ProductForm = ({ formState, setFormState, selectedProduct }: ProductFormPr
       }
     }
     setIsLoading(false)
+  }
+
+  const onDelete = async () => {
+    if (!selectedProduct) return
+    setIsDeleting(true)
+    const res = await deleteProduct(selectedProduct.id)
+    if (res) {
+      setProducts(prev => prev.filter(item => item.id !== selectedProduct.id))
+    }
+    setFormState(null)
+    setIsDeleting(false)
   }
   
   useEffect(() => {
@@ -155,7 +168,7 @@ const ProductForm = ({ formState, setFormState, selectedProduct }: ProductFormPr
             </Edit>
           }
           {formState !== 'create' &&
-            <Button type="dashed" danger>
+            <Button type="dashed" danger onClick={onDelete} loading={isDeleting}>
               DELETE
             </Button>
           }

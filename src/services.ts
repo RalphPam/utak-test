@@ -1,6 +1,6 @@
 import { uuidv4 } from '@firebase/util'
 import { message } from 'antd'
-import { child, get, getDatabase, ref, set } from 'firebase/database'
+import { child, get, getDatabase, ref, remove, set } from 'firebase/database'
 import { ProductDetails } from './types/form'
 import { GetProductsResponse } from './types/response'
 import { formatChildToArray } from './utils/format'
@@ -30,5 +30,18 @@ export async function getProducts(): Promise<GetProductsResponse> {
     message.error('Something went wrong, please try again later', 3)
     console.error(error)
     return []
+  }
+}
+
+export async function deleteProduct(id: string): Promise<boolean> {
+  try {
+    const db = getDatabase()
+    await remove(ref(db, 'products/' + id))
+    message.success('Product deleted successfully', 3)
+    return true
+  } catch (error) {
+    message.error('Something went wrong, please try again later', 3)
+    console.error(error)
+    return false
   }
 }
