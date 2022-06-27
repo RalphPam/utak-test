@@ -1,8 +1,9 @@
 import 'antd/dist/antd.min.css'
 import { Layout } from 'antd'
 import styled from 'styled-components'
+import { Header } from './components'
 
-const { Header, Content, Sider } = Layout
+const { Content, Sider } = Layout
 
 const StyledLayout = styled(Layout)`
   height: calc(100vh - 64px);
@@ -11,7 +12,7 @@ const StyledLayout = styled(Layout)`
 function App() {
   return (
     <Layout>
-      <Header>Header</Header>
+      <Header />
       <StyledLayout>
         <Content>Content</Content>
         <Sider collapsedWidth={0}>Sider</Sider>
