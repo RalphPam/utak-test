@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import colors from '../utils/color'
 
 const StyledCard = styled(Card)`
-  background-color: ${colors.lightBlack};
+  background-color: ${colors.black90};
   width: 100px;
   height: 100px;
   border-radius: 7px;

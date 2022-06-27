@@ -1,10 +1,10 @@
 import 'antd/dist/antd.min.css'
 import { Layout, Space } from 'antd'
 import styled from 'styled-components'
-import { Header, Product } from './components'
+import { Header, Product, ProductForm } from './components'
 import colors from './utils/color'
 
-const { Content, Sider } = Layout
+const { Content } = Layout
 
 const StyledLayout = styled(Layout)`
   height: calc(100vh - 64px);
@@ -33,7 +33,7 @@ function App() {
             <Product />
           </Space>
         </StyledContent>
-        <Sider collapsedWidth={0}>Sider</Sider>
+        <ProductForm />
       </StyledLayout>
     </Layout>
   )
