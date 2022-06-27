@@ -13,6 +13,8 @@ const StyledLayout = styled(Layout)`
 const StyledContent = styled(Content)`
   background-color: ${colors.black};
   padding: 12px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
 `
 
 function App() {
